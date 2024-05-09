@@ -1,0 +1,37 @@
+import time
+from machine import Pin
+import network
+from umqtt.simple import MQTTClient
+
+Button = Pin(1, Pin.IN)
+ 
+# Connect to Wi-Fi
+wifi = network.WLAN(network.STA_IF)  # STA_IF for station mode (client)
+wifi.active(True)
+wifi.connect('A106_2.4G', 'A106W1rel3ssPa55w.rd')  # Replace 'SSID' and 'password' with your Wi-Fi credentials
+
+# Wait until connected
+while not wifi.isconnected():
+    pass
+print('Connected to Wi-Fi:', wifi.ifconfig())
+
+mqtt_client_id = "romeochuob"
+
+mqtt_client = MQTTClient(
+        client_id=mqtt_client_id,
+        server="test.mosquitto.org",
+        user="",
+        password="")
+
+mqtt_client.connect()
+
+
+# Main Loop
+while True:
+  # Sleep to improve performance
+  time.sleep(0.1)
+  # Check if the button was pressed
+  if Button.value() == 1:
+    mqtt_client.publish("chuobr", "pressed")
+    
+    time.sleep(0.5)
